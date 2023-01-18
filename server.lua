@@ -8,17 +8,22 @@ AddEventHandler('qb-methcar:start', function()
     local ItemLithium = Player.Functions.GetItemByName("lithium")
 	local ItemMethlab = Player.Functions.GetItemByName("methlab")
 	if ItemAcetone ~= nil and ItemLithium ~= nil and ItemMethlab ~= nil then
-		if ItemAcetone.amount >= 5 and ItemLithium.amount >= 2 and ItemMethlab.amount >= 1 then	
+		if ItemAcetone.amount == 7 and ItemLithium.amount == 3 and ItemMethlab.amount == 1 then	
+			TriggerClientEvent("qb-methcar:startprod", _source)
+			Player.Functions.RemoveItem("acetone", 7, false)
+			Player.Functions.RemoveItem("lithium", 3, false)
+		else
 			TriggerClientEvent("qb-methcar:startprod", _source)
 			Player.Functions.RemoveItem("acetone", 5, false)
-			Player.Functions.RemoveItem("lithium", 2, false)
-		else
+			Player.Functions.RemoveItem("lithium", 5, false)
 		TriggerClientEvent('qb-methcar:stop', _source)
-		TriggerClientEvent('QBCore:Notify', source, "U don't have enough ingredients to cook!", 'error')
+		TriggerClientEvent('okokNotify:Alert', source, 'Meth Cooking', "Looks like that recipe didn't work", 3000, 'error')
+		--TriggerClientEvent('QBCore:Notify', source, "U don't have enough ingredients to cook!", 'error')
 		end
 	else
 	TriggerClientEvent('qb-methcar:stop', _source)
-	TriggerClientEvent('QBCore:Notify', source, "You're missing essential ingredients!", 'error')
+	TriggerClientEvent('okokNotify:Alert', source, 'Meth Cooking', "You're missing essential ingredients!", 3000, 'error')
+	--TriggerClientEvent('QBCore:Notify', source, "You're missing essential ingredients!", 'error')
 	end
 end)
 
@@ -46,8 +51,8 @@ AddEventHandler('qb-methcar:finish', function(qualtiy)
 	local xPlayer = QBCore.Functions.GetPlayer(tonumber(source))
 	local rnd = math.random(-5, 5)
 	local amount = math.floor(qualtiy / 2) + rnd
-	xPlayer.Functions.AddItem('meth', amount)
-	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['meth'], "add", amount)
+	xPlayer.Functions.AddItem('meth_tray', math.random(1,2))
+	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['meth_tray'], "add", amount)
 end)
 
 RegisterServerEvent('qb-methcar:blow')

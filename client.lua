@@ -10,22 +10,30 @@ AddEventHandler('qb-methcar:stop', function()
 	LastVehicle = QBCore.Functions.GetClosestVehicle()
 	started = false
 	progress = 0
-	QBCore.Functions.Notify("Production stopped...", "error")
+	--QBCore.Functions.Notify("Production stopped...", "error")
+	exports['okokNotify']:Alert('Meth Cooking',"Production stopped...", 3000, 'success')
 	FreezeEntityPosition(LastVehicle, false)
 end)
 
 RegisterNetEvent('qb-methcar:notify')
 AddEventHandler('qb-methcar:notify', function(message)
-	QBCore.Functions.Notify(message)
+	--QBCore.Functions.Notify(message)
+	exports['okokNotify']:Alert('Meth Cooking',message, 3000, 'success')
 end)
 
 RegisterNetEvent('qb-methcar:startprod')
 AddEventHandler('qb-methcar:startprod', function()
+	local chance = math.random(1,5)
+		
+		if chance == 1 then
+		TriggerServerEvent('police:server:policeAlert', 'Person witnesses a suspicious vehicle')
+		end
 	CurrentVehicle = GetVehiclePedIsUsing(PlayerPedId(-1))
 	started = true
 	pause = false
 	FreezeEntityPosition(CurrentVehicle, true)
-	QBCore.Functions.Notify("Production started", "success")
+	-- QBCore.Functions.Notify("Production started", "success")
+	exports['okokNotify']:Alert('Meth Cooking',"Production started...", 3000, 'error')
 end)
 
 RegisterNetEvent('qb-methcar:smoke')
@@ -49,6 +57,7 @@ end)
 
 -------------------------------------------------------EVENTS NEGATIVE
 RegisterNetEvent('qb-methcar:boom', function()
+	TriggerServerEvent('police:server:policeAlert', 'I just heard a loud explosion')
 	playerPed = (PlayerPedId())
 	local pos = GetEntityCoords((PlayerPedId()))
 	pause = false
@@ -77,21 +86,18 @@ end)
 
 RegisterNetEvent('qb-methcar:drugged')
 AddEventHandler('qb-methcar:drugged', function()
-	local pos = GetEntityCoords((PlayerPedId()))
-	SetTimecycleModifier("drug_drive_blend01")
-	SetPedMotionBlur((PlayerPedId()), true)
-	SetPedMovementClipset((PlayerPedId()), "MOVE_M@DRUNK@SLIGHTLYDRUNK", true)
-	SetPedIsDrunk((PlayerPedId()), true)
-	quality = quality - 3
-	pause = false
-	Citizen.Wait(90000)
-	ClearTimecycleModifier()
-	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+
+	local chance = math.random(1,5)
+	if chance <= 1 then 
+		TriggerServerEvent('police:server:policeAlert', 'I smell something funny')
+	end
+	SetEntityHealth(PlayerPedId(), 10)
 end)
 
 RegisterNetEvent('qb-methcar:q-1police', function(data)
 	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "error")
+	-- QBCore.Functions.Notify(data.message, "error")
+	exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'error')
 	quality = quality - 1
 	pause = false
 	TriggerServerEvent('police:server:policeAlert', 'Person reports stange smell!')
@@ -99,11 +105,21 @@ RegisterNetEvent('qb-methcar:q-1police', function(data)
 end)
 
 RegisterNetEvent('qb-methcar:q-1', function(data)
-	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "error")
-	quality = quality - 1
-	pause = false
-	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+	local success = exports['qb-lock']:StartLockPickCircle(1, 10, success)
+ 
+    if success then
+		local pos = GetEntityCoords((PlayerPedId()))
+		-- QBCore.Functions.Notify(data.message, "error")
+		exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'success')
+		quality = quality - 1
+		pause = false
+		TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+	else
+		exports['okokNotify']:Alert('Meth Cooking', "You aren't too good at this", 3000, 'error')
+		
+		TriggerEvent('qb-methcar:blowup')
+		TriggerEvent('qb-methcar:stop')
+	end
 end)
 
 RegisterNetEvent('qb-methcar:q-3', function(data)
@@ -116,7 +132,8 @@ end)
 
 RegisterNetEvent('qb-methcar:q-5', function(data)
 	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "error")
+	-- QBCore.Functions.Notify(data.message, "error")
+	exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'success')
 	quality = quality - 5
 	pause = false
 	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
@@ -125,32 +142,54 @@ end)
 -------------------------------------------------------EVENTS POSITIVE
 RegisterNetEvent('qb-methcar:q2', function(data)
 	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "success")
+	-- QBCore.Functions.Notify(data.message, "success")
+	exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'success')
 	quality = quality + 2
 	pause = false
 	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
 end)
 
-RegisterNetEvent('qb-methcar:q3', function(data)
-	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "success")
-	quality = quality + 3
-	pause = false
-	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+RegisterNetEvent('qb-methcar:q-3', function(data)
+	local success = exports['qb-lock']:StartLockPickCircle(1, 10, success)
+    print(success)
+    if success then
+		local pos = GetEntityCoords((PlayerPedId()))
+		-- QBCore.Functions.Notify(data.message, "error")
+		exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'success')
+		quality = quality - 3
+		pause = false
+		TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+	else
+		exports['okokNotify']:Alert('Meth Cooking', "You aren't to good at this", 3000, 'error')
+		TriggerEvent('qb-methcar:blowup')
+		TriggerEvent('qb-methcar:stop')
+	end
+	
 end)
 
-RegisterNetEvent('qb-methcar:q5', function(data)
-	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "success")
-	quality = quality + 5
-	pause = false
-	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+RegisterNetEvent('qb-methcar:q-5', function(data)
+	local success = exports['qb-lock']:StartLockPickCircle(1, 10, success)
+    print(success)
+    if success then
+		local pos = GetEntityCoords((PlayerPedId()))
+		-- QBCore.Functions.Notify(data.message, "error")
+		exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'success')
+		quality = quality - 5
+		pause = false
+		TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
+	else
+		exports['okokNotify']:Alert('Meth Cooking', "You aren't to good at this", 3000, 'error')
+		TriggerEvent('qb-methcar:blowup')
+		TriggerEvent('qb-methcar:stop')
+	end
+	
 end)
 
 RegisterNetEvent('qb-methcar:gasmask', function(data)
 	local pos = GetEntityCoords((PlayerPedId()))
-	QBCore.Functions.Notify(data.message, "success")
-	SetPedPropIndex(playerPed, 1, 26, 7, true)
+	-- QBCore.Functions.Notify(data.message, "success")
+	exports['okokNotify']:Alert('Meth Cooking',data.message, 3000, 'success')
+	-- SetPedPropIndex(playerPed, 1, 26, 7, true)
 	quality = quality + 2
 	pause = false
 	TriggerServerEvent('qb-methcar:make', pos.x,pos.y,pos.z)
@@ -169,7 +208,8 @@ RegisterNetEvent('qb-methcar:cook', function()
 		Wait(1000)
 		quality = 0
 	else
-		QBCore.Functions.Notify('There is someone in your kitchen?!', "error")
+		-- QBCore.Functions.Notify('There is someone in your kitchen?!', "error")
+		exports['okokNotify']:Alert('Meth Cooking',"There is someone in your kitchen?!", 3000, 'error')
 	end
 end)
 
@@ -197,7 +237,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 				}
 			},
 			{
-				header = "🔴 Let it go!",
+				header = "🔴 Continue cooking",
 				params = {
 					event = "qb-methcar:boom"
 				}
@@ -205,7 +245,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 			{
 				header = "🔴 Replace tube",
 				params = {
-					event = "qb-methcar:q5",
+					event = "qb-methcar:q-5",
 					args = {
 						message = "Replacing it was the best solution!"
 					}
@@ -234,9 +274,10 @@ RegisterNetEvent('qb-methcar:proses', function()
 				}
 			},
 			{
-				header = "🔴 Breathe it in..",
+				header = "🔴 Scoop it up",
 				params = {
-					event = "qb-methcar:drugged"
+					event = "qb-methcar:drugged",
+				
 				}
 			},
 			{
@@ -264,7 +305,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 			{
 				header = "🔴 Add more temperature",
 				params = {
-					event = "qb-methcar:q5",
+					event = "qb-methcar:q-5",
 					args = {
 						message = "A higher temperture made the perfect balance!"
 					}
@@ -297,7 +338,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 		pause = true
 		exports['qb-menu']:openMenu({
 			{
-				header = "You added to much acetone, what to do?",
+				header = "You added too much acetone, what to do?",
 				txt = "Pick your answer below. Progres: " .. progress .. "%",
 				isMenuHeader = true,
 			},
@@ -319,7 +360,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 			{
 				header = "🔴 Add lithium to stabilize",
 				params = {
-					event = "qb-methcar:q5",
+					event = "qb-methcar:q-5",
 					args = {
 						message = "Smart solution"
 					}
@@ -334,14 +375,14 @@ RegisterNetEvent('qb-methcar:proses', function()
 		pause = true
 		exports['qb-menu']:openMenu({
 			{
-				header = "There is some blue pigment, use it?",
+				header = "There is some grey pigment, use it?",
 				txt = "Pick your answer below. Progres: " .. progress .. "%",
 				isMenuHeader = true,
 			},
 			{
 				header = "🔴 Add it in the mix!",
 				params = {
-					event = "qb-methcar:q5",
+					event = "qb-methcar:q-5",
 					args = {
 						message = "Smart move, people like it!"
 					}
@@ -361,7 +402,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 	--
 	--   EVENT 6
 	--
-	if progress > 59 and progress < 61 then
+	if progress > 69 and progress < 71 then
 		pause = true
 		exports['qb-menu']:openMenu({
 			{
@@ -381,7 +422,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 			{
 				header = "🔴 Replace the filter!",
 				params = {
-					event = "qb-methcar:q5",
+					event = "qb-methcar:q-5",
 					args = {
 						message = "Replacing was the best option!"
 					}
@@ -401,77 +442,77 @@ RegisterNetEvent('qb-methcar:proses', function()
 	--
 	--   EVENT 7
 	--
-	if progress > 69 and progress < 71 then
-		pause = true
-		exports['qb-menu']:openMenu({
-			{
-				header = "You spilled some acetone on the floor.. now what?",
-				txt = "Pick your answer below. Progres: " .. progress .. "%",
-				isMenuHeader = true,
-			},
-			{
-				header = "🔴 Breathe it in..",
-				params = {
-					event = "qb-methcar:drugged"
-				}
-			},
-			{
-				header = "🔴 Put on a gas mask",
-				params = {
-					event = "qb-methcar:gasmask",
-					args = {
-						message = "Good choice"
-					}
-				}
-			},
-			{
-				header = "🔴 Open a window",
-				params = {
-					event = "qb-methcar:q-1police",
-					args = {
-						message = "The pungent smell is attracting more people!"
-					}
-				}
-			},
-		})
-	end
+	-- if progress > 69 and progress < 71 then
+	-- 	pause = true
+	-- 	exports['qb-menu']:openMenu({
+	-- 		{
+	-- 			header = "You spilled some acetone on the floor.. now what?",
+	-- 			txt = "Pick your answer below. Progres: " .. progress .. "%",
+	-- 			isMenuHeader = true,
+	-- 		},
+	-- 		{
+	-- 			header = "🔴 Breathe it in..",
+	-- 			params = {
+	-- 				event = "qb-methcar:drugged"
+	-- 			}
+	-- 		},
+	-- 		{
+	-- 			header = "🔴 Put on a gas mask",
+	-- 			params = {
+	-- 				event = "qb-methcar:gasmask",
+	-- 				args = {
+	-- 					message = "Good choice"
+	-- 				}
+	-- 			}
+	-- 		},
+	-- 		{
+	-- 			header = "🔴 Open a window",
+	-- 			params = {
+	-- 				event = "qb-methcar:q-1police",
+	-- 				args = {
+	-- 					message = "The pungent smell is attracting more people!"
+	-- 				}
+	-- 			}
+	-- 		},
+	-- 	})
+	-- end
 	--
 	--   EVENT 8
 	--
-	if progress > 79 and progress < 81 then
-		pause = true
-		exports['qb-menu']:openMenu({
-			{
-				header = "Gas tank is leaking... now what?",
-				txt = "Pick your answer below. Progres: " .. progress .. "%",
-				isMenuHeader = true,
-			},
-			{
-				header = "🔴 Let it go!",
-				params = {
-					event = "qb-methcar:boom"
-				}
-			},
-			{
-				header = "🔴 Fix it with tape",
-				params = {
-					event = "qb-methcar:q-3",
-					args = {
-						message = "That kinda fixed it, i think?!"
-					}
-				}
-			},
-			{
-				header = "🔴 Replace tube",
-				params = {
-					event = "qb-methcar:q5",
-					args = {
-						message = "Replacing was the best solution!"
-					}
-				}
-			},
-		})
-	end
+	-- if progress > 79 and progress < 81 then
+	-- 	pause = true
+	-- 	exports['qb-menu']:openMenu({
+	-- 		{
+	-- 			header = "Gas tank is leaking... now what?",
+	-- 			txt = "Pick your answer below. Progres: " .. progress .. "%",
+	-- 			isMenuHeader = true,
+	-- 		},
+	-- 		{
+	-- 			header = "🔴 Let it go!",
+	-- 			params = {
+	-- 				event = "qb-methcar:boom"
+	-- 			}
+	-- 		},
+	-- 		{
+	-- 			header = "🔴 Fix it with tape",
+	-- 			params = {
+	-- 				event = "qb-methcar:q-3",
+	-- 				args = {
+	-- 					message = "That kinda fixed it, i think?!"
+	-- 				}
+	-- 			}
+	-- 		},
+	-- 		{
+	-- 			header = "🔴 Replace tube",
+	-- 			params = {
+	-- 				event = "qb-methcar:q-5",
+	-- 				args = {
+	-- 					message = "Replacing was the best solution!"
+	-- 				}
+	-- 			}
+	-- 		},
+	-- 	})
+	-- end
 	--
 	--   EVENT 9
 	--
@@ -486,7 +527,7 @@ RegisterNetEvent('qb-methcar:proses', function()
 			{
 				header = "🔴 Just pinch it off!",
 				params = {
-					event = "qb-methcar:q5",
+					event = "qb-methcar:q-5",
 					args = {
 						message = "Superb Job!"
 					}
@@ -552,9 +593,10 @@ Citizen.CreateThread(function()
 		if started == true then
 			if pause == false and IsPedInAnyVehicle(playerPed) then
 				Citizen.Wait(250)
-				progress = progress +  1
+				progress = progress +  2
 				quality = quality + 1
-				QBCore.Functions.Notify('Meth production: ' .. progress .. '%')
+				 QBCore.Functions.Notify('Meth production: ' .. progress .. '%')
+				--exports['okokNotify']:Alert('Meth Cooking',"Progress " .. progress , 3000, 'success')
 				TriggerEvent('qb-methcar:proses')
 				Citizen.Wait(2000)
 			end
