@@ -1,6 +1,7 @@
-# qb-methcar
+# qb-methcar edited to use okokNotify, ps-ui, and better fail events.
 
 # Doesn't include the shop ped featured in the preview video.
+
 
 - [Preview](https://www.youtube.com/watch?v=DxdVkQSX17I)
 
@@ -9,11 +10,6 @@
 - [qb-target](https://github.com/BerkieBb/qb-target)
 - [qb-inventory](https://github.com/qbcore-framework/qb-inventory) *or* as showcased in the video lj-inventory!
 
-Thanks for showing your personal interest in my work! 
-Please consider supporting ❤
-
-🔗 > https://discord.gg/Tu94MCDDEa
-🔗 > https://samuels-development.dev/
 
 ## Installation
 ### Manually
